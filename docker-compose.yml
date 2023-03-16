@@ -1,0 +1,110 @@
+version: '3'
+
+services:
+  php:
+    container_name: php_dock
+    build: php/
+    restart: unless-stopped
+    volumes:
+      - ./src/:/var/www/html
+    expose:
+      - "9000"
+    depends_on:
+      - db
+
+  nginx:
+    container_name: nginx_dock
+    image: nginx:stable-alpine
+    restart: unless-stopped
+    volumes:
+      - ./src/:/var/www/html
+
+      - ./nginx/conf/nginx.conf:/etc/nginx/conf/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+
+    ports:
+      - "80:80"
+      
+  db:
+    container_name: mariadb_dock
+    image: mariadb:latest
+    restart: unless-stopped
+    hostname: mariadb
+    volumes:
+      - ./mariadb/initdb/:/docker-entrypoint-initdb.d
+      - ./mariadb/data/:/var/lib/mysql/
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+      # - MYSQL_DATABASE=devops_db
+      - MYSQL_USER=ken
+      # - MYSQL_PASSWORD=123456789
+      # - MYSQL_ROOT_HOST=localhost
+      # - MARIADB_ROOT_PASSWORD = 123456789
+      # - "MYSQL_ROOT_HOST=%"
+  pma:
+    container_name: php-myadmin
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    networks:
+      - default
+    expose:
+      - "80"
+    ports:
+      - "3001:80"
+    environment:
+      - PMA_HOST=mariadb
+      - PMA_HOSTS=http://localhost.com/phpmyadmin
+
+# networks:
+#   default:
+#     external:
+#       name:
+#         web_network
+
+# Docker เป็นเครื่องมือที่มีคำสั่งหลายอย่างสำหรับจัดการกับ Image และ Container ซึ่งมีความสำคัญในการใช้งาน Docker ดังนี้
+
+# คำสั่ง Docker Image:
+
+# docker build : สร้าง Image จาก Dockerfile
+# docker push : อัพโหลด Image ไปยัง Docker Registry
+# docker pull : ดาวน์โหลด Image จาก Docker Registry
+# docker tag : ติดตั้ง tag ให้กับ Image
+# คำสั่ง Docker Container:
+
+# docker run : สร้าง Container จาก Image และเริ่มต้นทำงาน
+# docker start : เริ่มต้น Container ที่ถูกหยุดชั่วคราว
+# docker stop : หยุด Container ทำงาน
+# docker restart : หยุดและเริ่มต้น Container ใหม่
+# docker pause : หยุดการทำงานของ Container
+# docker unpause : เริ่มต้นการทำงานของ Container ที่ถูกหยุดชั่วคราว
+# docker kill : จบการทำงานของ Container ทันที
+# docker rm : ลบ Container ที่หยุดการทำงาน
+# docker exec : รันคำสั่งภายใน Container ที่กำลังทำงาน
+# คำสั่ง Docker Network:
+
+# docker network create : สร้าง Docker network
+# docker network ls : แสดงรายชื่อ Docker network
+# docker network connect : เชื่อมต่อ Container เข้ากับ Docker network
+# docker network disconnect : ยกเลิกการเชื่อมต่อ Container กับ Docker network
+# คำสั่ง Docker Volume:
+
+# docker volume create : สร้าง Docker volume
+# docker volume ls : แสดงรายชื่อ Docker volume
+# docker volume rm : ลบ Docker volume
+# docker volume inspect : แสดงรายละเอียด Docker volume
+# คำสั่ง Docker Compose:
+
+# docker-compose up : สร้างและเริ่มต้นการทำงานของ Docker container จาก docker-compose.yml
+# docker-compose down : หยุดการทำงานและลบ Docker container ที่สร้างจาก docker-compose.yml
+# docker ps : แสดงรายชื่อของ Container ที่กำลังทำงานอยู่
+# docker images : แสดงรายชื่อของ Image ที่มีอยู่ในระบบ
+# docker rmi : ลบ Image
+# docker cp : คัดลอกไฟล์ระหว่างเครื่อง Host และ Container
+# docker logs : แสดง log ของ Container
+# docker inspect : แสดงรายละเอียด Container หรือ Image
+# docker-compose build : สร้าง Image จาก Dockerfile และเรียกใช้ docker-compose.yml
+# docker-compose up -d : สร้างและเริ่มต้นการทำงานของ Docker container จาก docker-compose.yml ในโหมด detached
+# docker-compose stop : หยุดการทำงานของ Docker container ที่สร้างจาก docker-compose.yml
+# docker-compose restart : หยุดและเริ่มต้น Docker container ใหม่จาก docker-compose.yml
+        
+        
